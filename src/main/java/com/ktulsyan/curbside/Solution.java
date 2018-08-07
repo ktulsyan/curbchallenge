@@ -7,6 +7,8 @@ import com.ktulsyan.curbside.models.Node;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -15,8 +17,15 @@ public class Solution {
 
   private static final String baseUrl = "https://challenge.curbside.com/";
   private static final Gson gson = new GsonBuilder().serializeNulls().create();
+  private static final boolean VERBOSE = true;
   private static String sessionId;
   private static final OkHttpClient httpClient = new OkHttpClient();
+
+  private static final Queue<String> queue = new ConcurrentLinkedQueue<>();
+
+  static {
+    queue.add("start");
+  }
 
   enum Paths {
     start("start"),
@@ -35,29 +44,41 @@ public class Solution {
   }
 
   /**
-   * Paths on this url:
-   * - start
-   * - get-session
+   * Paths on this url
+   *
+   * 1. start 2. get-session
    */
 
   public static void main(String[] args) throws IOException {
     initialize();
 
-    Node start = gson.fromJson(callUrl(baseUrl + Paths.start, getSessionHeader()), Node.class);
-
-    System.out.println(start);
+    while (!queue.isEmpty()) {
+      String id = queue.poll();
+      String response = callUrl(baseUrl + id);
+      if (VERBOSE) {
+        System.out.printf("Response: %s\n", response);
+      }
+      Node node = gson.fromJson(response, Node.class);
+      System.out.printf("%s\n", node);
+      queue.addAll(node.getNextIds());
+    }
   }
 
 
   private static Map<String, String> getSessionHeader() {
-    Map<String, String> headers = new HashMap<>();
-    headers.put("session", sessionId);
-
-    return headers;
+    if (sessionId == null) {
+      return null;
+    }
+    Map<String, String> header = new HashMap<>();
+    header.put("session", sessionId);
+    return header;
   }
 
-  private static String callUrl(String url, Map<String, String> headers) {
+  private static String callUrl(String url) {
     Request.Builder builder = new Request.Builder().url(url);
+
+    Map<String, String> headers = getSessionHeader();
+
     if (headers != null) {
       headers.forEach(builder::addHeader);
     }
@@ -81,9 +102,12 @@ public class Solution {
 
   private static void initialize() {
     if (sessionId == null) {
-      String response = callUrl(baseUrl + Paths.getSession, null);
+      String response = callUrl(baseUrl + Paths.getSession);
       JsonObject json = gson.fromJson(response, JsonObject.class);
       sessionId = json.get("session").getAsString();
+      System.out.println("-----------SESSION-ID----------");
+      System.out.println(sessionId);
+      System.out.println("-------------------------------");
     }
   }
 }
