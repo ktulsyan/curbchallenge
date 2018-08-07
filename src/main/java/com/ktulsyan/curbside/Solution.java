@@ -3,10 +3,9 @@ package com.ktulsyan.curbside;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
+import com.ktulsyan.curbside.models.Node;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,7 +17,6 @@ public class Solution {
   private static final Gson gson = new GsonBuilder().serializeNulls().create();
   private static String sessionId;
   private static final OkHttpClient httpClient = new OkHttpClient();
-
 
   enum Paths {
     start("start"),
@@ -34,18 +32,6 @@ public class Solution {
     public String toString() {
       return value;
     }
-  }
-
-  class Node {
-
-    @SerializedName("depth")
-    int depth;
-    @SerializedName("id")
-    String id;
-    @SerializedName("message")
-    String message;
-    @SerializedName("next")
-    List<String> nextIds;
   }
 
   /**
