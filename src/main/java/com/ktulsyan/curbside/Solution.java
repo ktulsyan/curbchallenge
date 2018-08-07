@@ -16,7 +16,10 @@ import okhttp3.Response;
 public class Solution {
 
   private static final String baseUrl = "https://challenge.curbside.com/";
-  private static final Gson gson = new GsonBuilder().serializeNulls().create();
+  private static final Gson gson = new GsonBuilder()
+      .registerTypeAdapter(Node.class, Node.TYPE_ADAPTER)
+      .serializeNulls()
+      .create();
   private static final boolean VERBOSE = true;
   private static String sessionId;
   private static final OkHttpClient httpClient = new OkHttpClient();
