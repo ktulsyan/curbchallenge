@@ -32,7 +32,7 @@ public class Node {
       List<String> nextIds = null;
       json.beginObject();
       while (json.hasNext()) {
-        switch (json.nextName()) {
+        switch (json.nextName().toLowerCase()) {
           case "id":
             id = json.nextString();
             break;
