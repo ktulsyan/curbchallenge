@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 @ToString
@@ -30,6 +32,7 @@ public class Node {
       int depth = 0;
       String message = null;
       List<String> nextIds = null;
+      String secret = null;
       json.beginObject();
       while (json.hasNext()) {
         switch (json.nextName().toLowerCase()) {
@@ -42,6 +45,11 @@ public class Node {
           case "message":
             message = json.nextString();
             break;
+          case "secret":
+            secret = json.nextString();
+            if(secret.isEmpty()) {
+              secret = null;
+            }
           case "next":
             nextIds = new ArrayList<>();
             switch (json.peek()) {
@@ -59,18 +67,20 @@ public class Node {
       }
       json.endObject();
 
-      return new Node(depth, id, message, nextIds);
+      return new Node(depth, id, message, secret, nextIds);
     }
   };
 
-  int depth;
+  @Getter int depth;
   String id;
   String message;
+  @Getter String secret;
   @EqualsAndHashCode.Exclude
   @SerializedName("next")
   List<String> nextIds;
 
+  @Nonnull
   public List<String> getNextIds() {
-    return Collections.unmodifiableList(nextIds);
+    return nextIds == null ? Collections.emptyList() : Collections.unmodifiableList(nextIds);
   }
 }

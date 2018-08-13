@@ -12,8 +12,8 @@ public class NodeTest {
 
   @Test
   public void EqualsAndHashCodeTest() {
-    Node a = new Node(0, "id", "msg", null);
-    Node b = new Node(0, "id", "msg", new ArrayList<>());
+    Node a = new Node(0, "id", "msg", "secret", null);
+    Node b = new Node(0, "id", "msg", "secret", new ArrayList<>());
 
     assertEquals(a, b);
     assertEquals(a.hashCode(), b.hashCode());
